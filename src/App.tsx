@@ -1,0 +1,63 @@
+import { GitHubBanner, Refine } from "@refinedev/core";
+import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+
+import { WelcomePage, notificationProvider } from "@refinedev/antd";
+import "@refinedev/antd/dist/reset.css";
+
+import routerBindings, {
+  UnsavedChangesNotifier,
+} from "@refinedev/react-router-v6";
+import dataProvider from "@refinedev/simple-rest";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ColorModeContextProvider } from "./contexts/color-mode";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <GitHubBanner />
+      <RefineKbarProvider>
+        <ColorModeContextProvider>
+          <Refine
+            resources={[
+              {
+                name: "products",
+                list: "/products",
+                create: "/products/create",
+                edit: "/products/edit/:id",
+                show: "/products/show/:id",
+                meta: {
+                  canDelete: true,
+                },
+              },
+              {
+                name: "categories",
+                list: "/categories",
+                create: "/categories/create",
+                edit: "/categories/edit/:id",
+                show: "/categories/show/:id",
+                meta: {
+                  canDelete: true,
+                },
+              },
+            ]}
+            notificationProvider={notificationProvider}
+            routerProvider={routerBindings}
+            dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
+            options={{
+              syncWithLocation: true,
+              warnWhenUnsavedChanges: true,
+            }}
+          >
+            <Routes>
+              <Route index element={<WelcomePage />} />
+            </Routes>
+            <RefineKbar />
+            <UnsavedChangesNotifier />
+          </Refine>
+        </ColorModeContextProvider>
+      </RefineKbarProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;
