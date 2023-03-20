@@ -1,63 +1,52 @@
-import { GitHubBanner, Refine } from "@refinedev/core";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import { Refine } from '@refinedev/core';
+import { Layout, notificationProvider, ErrorComponent } from '@refinedev/antd';
+import routerBindings, { UnsavedChangesNotifier } from '@refinedev/react-router-v6';
+import dataProvider from '@refinedev/simple-rest';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { AntdInferencer } from '@refinedev/inferencer/antd';
 
-import { WelcomePage, notificationProvider } from "@refinedev/antd";
-import "@refinedev/antd/dist/reset.css";
+import '@refinedev/antd/dist/reset.css';
 
-import routerBindings, {
-  UnsavedChangesNotifier,
-} from "@refinedev/react-router-v6";
-import dataProvider from "@refinedev/simple-rest";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { ColorModeContextProvider } from "./contexts/color-mode";
-
-function App() {
+const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <GitHubBanner />
-      <RefineKbarProvider>
-        <ColorModeContextProvider>
-          <Refine
-            resources={[
-              {
-                name: "products",
-                list: "/products",
-                create: "/products/create",
-                edit: "/products/edit/:id",
-                show: "/products/show/:id",
-                meta: {
-                  canDelete: true,
-                },
-              },
-              {
-                name: "categories",
-                list: "/categories",
-                create: "/categories/create",
-                edit: "/categories/edit/:id",
-                show: "/categories/show/:id",
-                meta: {
-                  canDelete: true,
-                },
-              },
-            ]}
-            notificationProvider={notificationProvider}
-            routerProvider={routerBindings}
-            dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
-            options={{
-              syncWithLocation: true,
-              warnWhenUnsavedChanges: true,
-            }}
-          >
-            <Routes>
-              <Route index element={<WelcomePage />} />
-            </Routes>
-            <RefineKbar />
-            <UnsavedChangesNotifier />
-          </Refine>
-        </ColorModeContextProvider>
-      </RefineKbarProvider>
+      <Refine
+        routerProvider={routerBindings}
+        dataProvider={dataProvider('https://api.fake-rest.refine.dev')}
+        notificationProvider={notificationProvider}
+        resources={[
+          {
+            name: 'products',
+            list: '/products',
+            show: '/products/show/:id',
+            create: '/products/create',
+            edit: '/products/edit/:id',
+          },
+        ]}
+        options={{
+          syncWithLocation: true,
+          warnWhenUnsavedChanges: true,
+        }}>
+        <Routes>
+          <Route
+            element={
+              <Layout>
+                <Outlet />
+              </Layout>
+            }>
+            <Route path="products">
+              <Route index element={<AntdInferencer />} />
+              <Route path="show/:id" element={<AntdInferencer />} />
+              <Route path="edit/:id" element={<AntdInferencer />} />
+              <Route path="create" element={<AntdInferencer />} />
+            </Route>
+            <Route path="*" element={<ErrorComponent />} />
+          </Route>
+        </Routes>
+        <UnsavedChangesNotifier />
+      </Refine>
     </BrowserRouter>
   );
-}
+};
 
 export default App;
